@@ -58,7 +58,7 @@
 
         .container {
             width: 100%;
-            max-width: 800px;
+            max-width: 900px;
             perspective: 1000px;
         }
 
@@ -304,7 +304,7 @@
 
         .tooltip-text {
             visibility: hidden;
-            width: 200px;
+            width: 250px;
             background: var(--surface-light);
             color: var(--text-light);
             text-align: center;
@@ -314,7 +314,7 @@
             z-index: 1;
             bottom: 125%;
             left: 50%;
-            margin-left: -100px;
+            margin-left: -125px;
             opacity: 0;
             transition: opacity 0.3s;
             box-shadow: var(--card-shadow-light);
@@ -432,6 +432,155 @@
         .target-capital .info-value {
             color: #ef4444;
         }
+
+        /* Nowe style dla rozwijanego menu informatycznego */
+        .info-box {
+            margin: 1.5rem 0;
+            background: var(--input-bg-light);
+            border-radius: 12px;
+            border: 1px solid var(--border-light);
+            overflow: hidden;
+        }
+        
+        .dark-mode .info-box {
+            background: var(--input-bg-dark);
+            border: 1px solid var(--border-dark);
+        }
+        
+        .info-box-header {
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.3s;
+            background-color: rgba(99, 102, 241, 0.1);
+        }
+        
+        .dark-mode .info-box-header {
+            background-color: rgba(99, 102, 241, 0.2);
+        }
+        
+        .info-box-header:hover {
+            background-color: rgba(99, 102, 241, 0.15);
+        }
+        
+        .dark-mode .info-box-header:hover {
+            background-color: rgba(99, 102, 241, 0.25);
+        }
+        
+        .info-box-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+            padding: 0 1rem;
+        }
+        
+        .info-box.active .info-box-content {
+            max-height: 1000px;
+            padding: 1rem;
+            transition: max-height 0.5s ease-in, padding 0.3s;
+        }
+        
+        .info-box-arrow {
+            transition: transform 0.3s;
+        }
+        
+        .info-box.active .info-box-arrow {
+            transform: rotate(180deg);
+        }
+        
+        .info-box p {
+            margin-bottom: 1rem;
+            line-height: 1.6;
+            font-size: 0.9rem;
+        }
+        
+        .info-box p:last-child {
+            margin-bottom: 0;
+        }
+        
+        .info-box ul {
+            margin-bottom: 1rem;
+            padding-left: 1.5rem;
+            line-height: 1.6;
+            font-size: 0.9rem;
+        }
+        
+        .info-box li {
+            margin-bottom: 0.5rem;
+        }
+        
+        .info-box li:last-child {
+            margin-bottom: 0;
+        }
+        
+        .info-box-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .example-card {
+            background: var(--surface-light);
+            border-radius: 8px;
+            padding: 1rem;
+            border: 1px solid var(--border-light);
+        }
+        
+        .dark-mode .example-card {
+            background: var(--surface-dark);
+            border: 1px solid var(--border-dark);
+        }
+        
+        .example-title {
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+            color: var(--primary-light);
+        }
+        
+        .example-value {
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+        
+        .example-desc {
+            font-size: 0.8rem;
+            margin-top: 0.5rem;
+            opacity: 0.8;
+        }
+
+        /* Style dla tabeli stylów życia */
+        .lifestyle-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1rem;
+            font-size: 0.85rem;
+        }
+        
+        .lifestyle-table th, 
+        .lifestyle-table td {
+            padding: 0.75rem;
+            border: 1px solid var(--border-light);
+            text-align: left;
+        }
+        
+        .dark-mode .lifestyle-table th, 
+        .dark-mode .lifestyle-table td {
+            border: 1px solid var(--border-dark);
+        }
+        
+        .lifestyle-table th {
+            background-color: rgba(99, 102, 241, 0.1);
+            font-weight: 600;
+        }
+        
+        .dark-mode .lifestyle-table th {
+            background-color: rgba(99, 102, 241, 0.2);
+        }
         
         /* Media query for mobile */
         @media (max-width: 640px) {
@@ -443,6 +592,19 @@
             .growth-table td {
                 padding: 0.5rem;
             }
+            
+            .lifestyle-table {
+                font-size: 0.75rem;
+            }
+            
+            .lifestyle-table th,
+            .lifestyle-table td {
+                padding: 0.5rem;
+            }
+            
+            .info-box-grid {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
@@ -451,8 +613,196 @@
         <div class="calculator-card">
             <div class="header">
                 <h1 class="title">Kalkulator Wolności Finansowej</h1>
-                <p class="subtitle">Oblicz swój cel finansowy i drogę do niezależności</p>
+                <p class="subtitle">Oblicz swój cel finansowy i drogę do niezależności (FIRE - Financial Independence, Retire Early)</p>
                 <button class="theme-toggle" id="themeToggle">🌙</button>
+            </div>
+            
+            <!-- Sekcja ogólnych informacji o FIRE -->
+            <div class="info-box">
+                <div class="info-box-header">
+                    <span>Co to jest FIRE?</span>
+                    <span class="info-box-arrow">▼</span>
+                </div>
+                <div class="info-box-content">
+                    <p><strong>FIRE (Financial Independence, Retire Early)</strong> to ruch zakładający agresywne oszczędzanie i inwestowanie w celu osiągnięcia niezależności finansowej na długo przed osiągnięciem tradycyjnego wieku emerytalnego.</p>
+                    
+                    <p>Oznacza to zgromadzenie takiego kapitału, by móc żyć z pasywnego dochodu z inwestycji. Kluczowe zasady:</p>
+                    
+                    <ul>
+                        <li><strong>Maksymalizacja stopy oszczędzania</strong> - zwolennicy FIRE często odkładają 50% i więcej swoich dochodów.</li>
+                        <li><strong>Inwestowanie długoterminowe</strong> - wykorzystanie mocy procentu składanego.</li>
+                        <li><strong>Kontrola wydatków</strong> - kluczowe, by utrzymać wysoką stopę oszczędzania.</li>
+                        <li><strong>Reguła 4%</strong> - popularny punkt odniesienia do określenia wymaganego kapitału.</li>
+                    </ul>
+                    
+                    <p>Czas potrzebny do osiągnięcia FIRE zależy głównie od stopy oszczędzania:</p>
+                    <ul>
+                        <li>Oszczędzanie 70% dochodu → FIRE w około 8-12 lat</li>
+                        <li>Oszczędzanie 50% dochodu → FIRE w około 15-20 lat</li>
+                        <li>Oszczędzanie 30% dochodu → FIRE w około 28 lat</li>
+                        <li>Oszczędzanie 10% dochodu → FIRE w ponad 50 lat</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- Koszty życia w Polsce - pomoc w ustaleniu wydatków -->
+            <div class="info-box">
+                <div class="info-box-header">
+                    <span>Koszty życia w Polsce - ile potrzebujesz?</span>
+                    <span class="info-box-arrow">▼</span>
+                </div>
+                <div class="info-box-content">
+                    <p>Koszty utrzymania zależą od stylu życia, lokalizacji oraz indywidualnych potrzeb. Poniższa tabela przedstawia szacunkowe miesięczne wydatki dla jednej osoby w Polsce:</p>
+                    
+                    <table class="lifestyle-table">
+                        <thead>
+                            <tr>
+                                <th>Styl życia</th>
+                                <th>Miesięczne koszty (2025)</th>
+                                <th>Opis</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Minimalny (oszczędny)</strong></td>
+                                <td>1500-2500 zł</td>
+                                <td>Zaspokojenie podstawowych potrzeb, skromne życie (poza dużymi miastami; w dużych miastach wyraźnie więcej)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Średni (przeciętny)</strong></td>
+                                <td>3000-4000 zł</td>
+                                <td>Umiarkowany standard, niewielkie oszczędności na przyjemności</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Komfortowy</strong></td>
+                                <td>5000-6000+ zł</td>
+                                <td>Wygodne życie, większe wydatki na przyjemności i hobby</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    
+                    <p>Przykłady:</p>
+                    <ul>
+                        <li>W Warszawie samotna osoba bez luksusów potrzebuje ok. <strong>3600 zł miesięcznie</strong>, aby pokryć podstawowe wydatki (wynajem kawalerki, żywność, transport itp.).</li>
+                        <li>Życie komfortowe w badaniach jest definiowane jako dochody rzędu <strong>4-5 tys. zł netto</strong> na osobę, a wielu uważa, że komfort zaczyna się od ok. <strong>6 tys. zł netto</strong>.</li>
+                    </ul>
+                    
+                    <p><strong>Uwaga:</strong> Planując FIRE, należy realnie oszacować własne docelowe koszty życia. Dla bezpieczeństwa warto dodać pewien margines na nieprzewidziane wydatki lub wzrost potrzeb.</p>
+                </div>
+            </div>
+            
+            <!-- Objaśnienie reguły 4% -->
+            <div class="info-box">
+                <div class="info-box-header">
+                    <span>Reguła 4% - ile potrzebujesz, by osiągnąć FIRE?</span>
+                    <span class="info-box-arrow">▼</span>
+                </div>
+                <div class="info-box-content">
+                    <p><strong>Reguła 4%</strong> to popularna metoda określania wymaganego kapitału do osiągnięcia niezależności finansowej. Wywodzi się z badań (Trinity Study) i sugeruje, że <em>jeśli w pierwszym roku emerytury wypłacimy 4% zgromadzonego kapitału, a potem co roku będziemy pobierać taką kwotę skorygowaną o inflację</em>, to oszczędności powinny wystarczyć na co najmniej 30 lat.</p>
+                    
+                    <p>Formuła jest prosta:</p>
+                    <p><strong>Wymagany kapitał = Roczne wydatki ÷ 0,04 = Roczne wydatki × 25</strong></p>
+                    
+                    <div class="info-box-grid">
+                        <div class="example-card">
+                            <div class="example-title">Przykład 1: Skromne życie</div>
+                            <div class="example-value">750 000 zł</div>
+                            <div class="example-desc">Przy wydatkach 2500 zł/mies. (30 000 zł rocznie)</div>
+                        </div>
+                        
+                        <div class="example-card">
+                            <div class="example-title">Przykład 2: Komfortowe życie</div>
+                            <div class="example-value">1 500 000 zł</div>
+                            <div class="example-desc">Przy wydatkach 5000 zł/mies. (60 000 zł rocznie)</div>
+                        </div>
+                    </div>
+                    
+                    <p>Zmodyfikowane podejścia:</p>
+                    <ul>
+                        <li><strong>Reguła 3-3,5%</strong> (bezpieczniejsza) - dla dłuższego horyzontu (>30 lat) lub większego bezpieczeństwa, wymagany kapitał to 28,5-33× rocznych wydatków.</li>
+                        <li><strong>Dynamiczna stopa wypłat</strong> - dostosowywanie wydatków do sytuacji rynkowej (mniej w latach bessy, więcej w hossy).</li>
+                        <li><strong>Semi-retirement</strong> - zakłada dodatkowe drobne dochody po osiągnięciu FIRE, co zmniejsza obciążenie portfela.</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- Formy inwestowania i oczekiwane stopy zwrotu -->
+            <div class="info-box">
+                <div class="info-box-header">
+                    <span>Inwestowanie w praktyce - jakich zwrotów oczekiwać?</span>
+                    <span class="info-box-arrow">▼</span>
+                </div>
+                <div class="info-box-content">
+                    <p>Realna stopa zwrotu (po odjęciu inflacji) z różnych klas aktywów w długim horyzoncie:</p>
+                    
+                    <ul>
+                        <li><strong>Akcje (giełda)</strong>: 5-7% realnie (po inflacji) rocznie z szeroko zdywersyfikowanego portfela akcji w długim terminie.</li>
+                        <li><strong>Nieruchomości (wynajem)</strong>: Obecnie ok. 3-5% realnie rocznie z najmu w dużych miastach w Polsce.</li>
+                        <li><strong>Obligacje skarbowe</strong>: Około 2-3% realnie rocznie w długim terminie.</li>
+                        <li><strong>Lokaty bankowe i gotówka</strong>: Zazwyczaj realna stopa zwrotu jest bliska zeru lub nawet ujemna (nie pokrywają inflacji).</li>
+                    </ul>
+                    
+                    <p><strong>Portfele mieszane</strong> (np. 60% akcje, 40% obligacje) mogą dawać 4-5% realnie rocznie przy mniejszej zmienności niż czysto akcyjne.</p>
+                    
+                    <p><strong>Inflacja w Polsce:</strong> Długoterminowy cel NBP to 2,5% (±1%). W planach FIRE zwykle przyjmuje się długoterminową inflację 2,5-3% rocznie. Skoki inflacji (jak 2022-2023, gdy sięgała 18%) pokazują jednak, że warto uwzględniać scenariusze awaryjne.</p>
+                    
+                    <p><strong>Uwaga:</strong> Wyższy oczekiwany zysk wiąże się z większym ryzykiem (zmiennością). Dlatego ważna jest dywersyfikacja portfela i dostosowanie struktury inwestycji do własnej tolerancji ryzyka i horyzontu czasowego.</p>
+                </div>
+            </div>
+            
+            <!-- Strategie inwestycyjne -->
+            <div class="info-box">
+                <div class="info-box-header">
+                    <span>Strategie oszczędzania i inwestowania</span>
+                    <span class="info-box-arrow">▼</span>
+                </div>
+                <div class="info-box-content">
+                    <p>Osiągnięcie wolności finansowej wymaga zarówno systematycznego oszczędzania, jak i mądrego inwestowania:</p>
+                    
+                    <ul>
+                        <li><strong>Maksymalizacja stopy oszczędzania</strong> - Odkładanie 50% lub więcej dochodów znacząco przyspiesza drogę do celu.</li>
+                        <li><strong>Kontrola budżetu</strong> - Szczegółowe śledzenie wydatków i eliminowanie zbędnych kosztów.</li>
+                        <li><strong>Inwestowanie pasywne</strong> - Regularne lokowanie środków w zdywersyfikowany portfel, bez prób spekulacji czy "timingu" rynku.</li>
+                        <li><strong>Reinwestowanie zysków</strong> - Wykorzystanie mocy procentu składanego poprzez reinwestycję wszystkich dochodów z inwestycji.</li>
+                    </ul>
+                    
+                    <p><strong>Proponowane narzędzia:</strong></p>
+                    <ul>
+                        <li>Globalne ETFy na akcje - np. na indeksy MSCI World, S&P500</li>
+                        <li>ETFy obligacyjne dla stabilizacji portfela</li>
+                        <li>IKE/IKZE dla optymalizacji podatkowej</li>
+                        <li>Ewentualnie nieruchomości na wynajem jako uzupełnienie</li>
+                    </ul>
+                    
+                    <p><strong>Typowe alokacje aktywów:</strong></p>
+                    <ul>
+                        <li>60/40 (akcje/obligacje) - klasyczny zbalansowany portfel</li>
+                        <li>75/25 - dla osób akceptujących większe ryzyko</li>
+                        <li>100/0 - dla młodszych inwestorów z długim horyzontem</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- Błędy i pułapki -->
+            <div class="info-box">
+                <div class="info-box-header">
+                    <span>Najczęstsze błędy i pułapki na drodze do FIRE</span>
+                    <span class="info-box-arrow">▼</span>
+                </div>
+                <div class="info-box-content">
+                    <p>Droga do wczesnej emerytury jest długoterminowym projektem. Oto typowe błędy, których warto unikać:</p>
+                    
+                    <ul>
+                        <li><strong>Nierealne założenia</strong> - Przyjmowanie zbyt optymistycznych stóp zwrotu i niedoszacowanie przyszłych wydatków.</li>
+                        <li><strong>Lifestyle creep</strong> - Stopniowe zwiększanie standardu życia wraz ze wzrostem dochodów, co utrudnia utrzymanie wysokiej stopy oszczędzania.</li>
+                        <li><strong>Brak dywersyfikacji</strong> - Stawianie wszystkiego na jedną klasę aktywów lub jeden konkretny instrument.</li>
+                        <li><strong>Panika podczas bessy</strong> - Sprzedawanie inwestycji podczas spadków i powrót na rynek po odbiciu (po wyższych cenach).</li>
+                        <li><strong>Ignorowanie inflacji</strong> - Nieuwzględnienie wpływu inflacji na siłę nabywczą portfela i przyszłych wydatków.</li>
+                        <li><strong>Zaniedbywanie aspektów psychologicznych</strong> - Brak planu na życie po osiągnięciu FIRE, co może prowadzić do utraty sensu i motywacji.</li>
+                    </ul>
+                    
+                    <p><strong>Warto zapamiętać:</strong> FIRE to nie tylko liczby i wzory. Ważne jest także znalezienie balansu, cieszenie się drogą do celu i przygotowanie się mentalnie na życie po osiągnięciu niezależności finansowej.</p>
+                </div>
             </div>
             
             <div class="form-group">
@@ -460,7 +810,7 @@
                     Miesięczne wydatki [PLN]
                     <span class="tooltip">
                         <span class="tooltip-icon">?</span>
-                        <span class="tooltip-text">Kwota comiesięcznych wydatków dla pierwszego miesiąca wolności finansowej</span>
+                        <span class="tooltip-text">Kwota comiesięcznych wydatków dla pierwszego miesiąca wolności finansowej. Użyj tabeli stylów życia powyżej jako punktu odniesienia.</span>
                     </span>
                 </label>
                 <input type="number" id="monthlyExpenses" class="input" value="5000" min="0" placeholder="np. 5000">
@@ -471,14 +821,20 @@
                     Stopa wypłaty [%]
                     <span class="tooltip">
                         <span class="tooltip-icon">?</span>
-                        <span class="tooltip-text">Zgodnie z "Regułą 4%" powinna wynosić 4%</span>
+                        <span class="tooltip-text">Zgodnie z "Regułą 4%" powinna wynosić 4%. Dla większego bezpieczeństwa lub dłuższego okresu emerytury rozważ 3-3,5%.</span>
                     </span>
                 </label>
                 <input type="number" id="withdrawalRate" class="input" value="4" min="1" max="10" step="0.5" placeholder="np. 4">
             </div>
             
             <div class="form-group">
-                <label for="timeHorizon">Horyzont czasowy</label>
+                <label for="timeHorizon">
+                    Horyzont czasowy
+                    <span class="tooltip">
+                        <span class="tooltip-icon">?</span>
+                        <span class="tooltip-text">Okres, na jaki planujesz swoją niezależność finansową. Im dłuższy, tym bezpieczniejsza powinna być stopa wypłaty.</span>
+                    </span>
+                </label>
                 <select id="timeHorizon" class="input">
                     <option value="10">10 lat</option>
                     <option value="20">20 lat</option>
@@ -487,7 +843,13 @@
             </div>
             
             <div class="form-group">
-                <label for="portfolioComposition">Skład portfela (Akcje/Obligacje)</label>
+                <label for="portfolioComposition">
+                    Skład portfela (Akcje/Obligacje)
+                    <span class="tooltip">
+                        <span class="tooltip-icon">?</span>
+                        <span class="tooltip-text">Wyższy udział akcji oznacza potencjalnie wyższe zwroty, ale większą zmienność. Dla młodszych inwestorów lepszy może być wyższy udział akcji (75-100%), dla ostrożniejszych - więcej obligacji.</span>
+                    </span>
+                </label>
                 <select id="portfolioComposition" class="input">
                     <option value="0">0/100</option>
                     <option value="25">25/75</option>
@@ -495,6 +857,17 @@
                     <option value="75">75/25</option>
                     <option value="100" selected>100/0</option>
                 </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="currentSavings">
+                    Obecne oszczędności [PLN]
+                    <span class="tooltip">
+                        <span class="tooltip-icon">?</span>
+                        <span class="tooltip-text">Jeśli już masz oszczędności, które będą częścią Twojego portfela FIRE, wpisz ich wartość tutaj.</span>
+                    </span>
+                </label>
+                <input type="number" id="currentSavings" class="input" value="0" min="0" placeholder="np. 50000">
             </div>
             
             <button id="calculateBtn" class="button">
@@ -541,6 +914,28 @@
                         </div>
                     </div>
                 </div>
+                
+                <div id="timeToFIRE" style="margin-top: 2rem; text-align: center; font-weight: bold; font-size: 1.2rem;"></div>
+            </div>
+            
+            <!-- Dodatkowe informacje na samym dole -->
+            <div class="info-box" style="margin-top: 2rem;">
+                <div class="info-box-header">
+                    <span>Dodatkowe zasoby i narzędzia</span>
+                    <span class="info-box-arrow">▼</span>
+                </div>
+                <div class="info-box-content">
+                    <p>Planowanie FIRE jest indywidualną podróżą. Oto przydatne zasoby, które mogą pomóc:</p>
+                    
+                    <ul>
+                        <li><strong>Książki</strong>: "Twój mózg, twoje pieniądze" (Jason Zweig), "Niezależność finansowa" (Marcin Iwuć)</li>
+                        <li><strong>Blogi</strong>: Blog finansowy Michała Szafrańskiego, Inwestomat, Mr. Money Mustache (po angielsku)</li>
+                        <li><strong>Narzędzia</strong>: Aplikacje do budżetowania, kalkulatory FIRE online</li>
+                        <li><strong>Społeczności</strong>: Grupy na Facebooku poświęcone FIRE i inwestowaniu pasywnym</li>
+                    </ul>
+                    
+                    <p><strong>Pamiętaj:</strong> FIRE to maraton, nie sprint. Wymaga cierpliwości, konsekwencji i dyscypliny, ale nagrodą jest swoboda decydowania o swoim życiu bez presji finansowej.</p>
+                </div>
             </div>
         </div>
     </div>
@@ -586,20 +981,53 @@
             themeToggle.textContent = document.body.classList.contains('dark-mode') ? '☀️' : '🌙';
         });
 
+        // Add click handlers for info boxes
+        const infoBoxes = document.querySelectorAll('.info-box');
+        infoBoxes.forEach(box => {
+            const header = box.querySelector('.info-box-header');
+            header.addEventListener('click', () => {
+                box.classList.toggle('active');
+            });
+        });
+
         // Function to calculate capital growth for each scenario
-        function calculateGrowth(monthlyInvestment, annualReturn, years) {
+        function calculateGrowth(monthlyInvestment, annualReturn, years, initialCapital = 0) {
             return years.map(year => {
-                if (year === 0) return 0;
+                if (year === 0) return initialCapital;
                 
                 // Calculate capital at this year using the compound interest formula
-                // P × ((1 + r)^n - 1) / r
+                // Initial capital compounded + P × ((1 + r)^n - 1) / r
                 // Where P is monthly payment, r is monthly rate, n is number of months
                 const monthlyRate = annualReturn / 12;
                 const months = year * 12;
-                const futureValue = monthlyInvestment * ((Math.pow(1 + monthlyRate, months) - 1) / monthlyRate);
                 
-                return Math.round(futureValue);
+                // Growth of initial capital
+                const initialCapitalGrowth = initialCapital * Math.pow(1 + annualReturn, year);
+                
+                // Growth of regular monthly investments
+                const futureValueOfPayments = monthlyInvestment * ((Math.pow(1 + monthlyRate, months) - 1) / monthlyRate);
+                
+                return Math.round(initialCapitalGrowth + futureValueOfPayments);
             });
+        }
+
+        // Function to estimate years to FIRE
+        function estimateYearsToFire(targetCapital, monthlyInvestment, annualReturn, initialCapital = 0) {
+            let years = 0;
+            let currentCapital = initialCapital;
+            
+            while (currentCapital < targetCapital && years < 100) {
+                years++;
+                // Growth of existing capital
+                currentCapital = currentCapital * (1 + annualReturn);
+                // Add monthly contributions for a year
+                currentCapital += monthlyInvestment * 12;
+                
+                // Break if it's taking too long (avoid infinite loops)
+                if (years >= 100) return Infinity;
+            }
+            
+            return years;
         }
 
         // Chart configuration
@@ -773,6 +1201,7 @@
             const withdrawalRate = parseFloat(document.getElementById('withdrawalRate').value);
             const timeHorizon = parseInt(document.getElementById('timeHorizon').value);
             const portfolioComposition = document.getElementById('portfolioComposition').value;
+            const currentSavings = parseFloat(document.getElementById('currentSavings').value) || 0;
 
             // Validate input
             if (isNaN(monthlyExpenses) || isNaN(withdrawalRate) || monthlyExpenses <= 0 || withdrawalRate <= 0) {
@@ -824,12 +1253,27 @@
             // Create year labels
             const years = Array.from({length: parseInt(timeHorizon) + 1}, (_, i) => i);
             
-            const medianGrowth = calculateGrowth(monthlyInvestment, averageAnnualReturn, years);
-            const luckyGrowth = calculateGrowth(luckyScenario, optimisticReturn, years);
-            const unluckyGrowth = calculateGrowth(unluckyScenario, pessimisticReturn, years);
+            const medianGrowth = calculateGrowth(monthlyInvestment, averageAnnualReturn, years, currentSavings);
+            const luckyGrowth = calculateGrowth(luckyScenario, optimisticReturn, years, currentSavings);
+            const unluckyGrowth = calculateGrowth(unluckyScenario, pessimisticReturn, years, currentSavings);
             
             // Create the growth chart
             createGrowthChart(requiredCapital, medianGrowth, luckyGrowth, unluckyGrowth, timeHorizon);
+            
+            // Calculate and display estimated years to FIRE
+            const yearsToFIRE = estimateYearsToFire(requiredCapital, monthlyInvestment, averageAnnualReturn, currentSavings);
+            const yearsToFIRELucky = estimateYearsToFire(requiredCapital, luckyScenario, optimisticReturn, currentSavings);
+            const yearsToFIREUnlucky = estimateYearsToFire(requiredCapital, unluckyScenario, pessimisticReturn, currentSavings);
+            
+            let fireMessage = '';
+            if (yearsToFIRE < 100) {
+                fireMessage = `<span style="color: var(--primary-light);">Osiągniesz niezależność finansową za około ${yearsToFIRE} lat</span> `;
+                fireMessage += `(wariant optymistyczny: ${yearsToFIRELucky} lat, wariant pesymistyczny: ${yearsToFIREUnlucky} lat).`;
+            } else {
+                fireMessage = '<span style="color: #ef4444;">Przy obecnych założeniach, osiągnięcie FIRE zajmie ponad 100 lat. Rozważ zwiększenie miesięcznych wpłat lub zmianę innych parametrów.</span>';
+            }
+            
+            document.getElementById('timeToFIRE').innerHTML = fireMessage;
 
             // Show results
             const resultsDiv = document.getElementById('results');
@@ -851,6 +1295,10 @@
             if (e.key === 'Enter') calculateFinancialFreedom();
         });
         
+        document.getElementById('currentSavings').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') calculateFinancialFreedom();
+        });
+        
         // Update chart when theme changes
         themeToggle.addEventListener('click', () => {
             // If chart exists and results are visible, update the chart with current values
@@ -859,6 +1307,7 @@
                 const withdrawalRate = parseFloat(document.getElementById('withdrawalRate').value);
                 const timeHorizon = parseInt(document.getElementById('timeHorizon').value);
                 const portfolioComposition = document.getElementById('portfolioComposition').value;
+                const currentSavings = parseFloat(document.getElementById('currentSavings').value) || 0;
                 
                 // Calculate required capital
                 const requiredCapital = (monthlyExpenses * 12) / (withdrawalRate / 100);
@@ -879,9 +1328,9 @@
                 const optimisticReturn = 0.09;    
                 const pessimisticReturn = 0.05;   
                 
-                const medianGrowth = calculateGrowth(monthlyInvestment, averageAnnualReturn, years);
-                const luckyGrowth = calculateGrowth(luckyScenario, optimisticReturn, years);
-                const unluckyGrowth = calculateGrowth(unluckyScenario, pessimisticReturn, years);
+                const medianGrowth = calculateGrowth(monthlyInvestment, averageAnnualReturn, years, currentSavings);
+                const luckyGrowth = calculateGrowth(luckyScenario, optimisticReturn, years, currentSavings);
+                const unluckyGrowth = calculateGrowth(unluckyScenario, pessimisticReturn, years, currentSavings);
                 
                 // Update the chart with current values
                 setTimeout(() => {
@@ -893,6 +1342,14 @@
         // Add pulse animation to calculate button
         const calculateBtn = document.getElementById('calculateBtn');
         calculateBtn.classList.add('pulse');
+        
+        // Remove pulse when button is clicked
+        calculateBtn.addEventListener('click', function() {
+            this.classList.remove('pulse');
+        });
+        
+        // Otwórz pierwszą sekcję informacyjną domyślnie
+        document.querySelector('.info-box').classList.add('active');
     </script>
 </body>
 </html>
