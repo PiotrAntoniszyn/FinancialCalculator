@@ -4,8 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kalkulator Wolności Finansowej 2025</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.4/dist/Chart.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.5/gsap.min.js"></script>
+    <!-- Simple Chart.js version without plugins -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.js"></script>
     <style>
         :root {
             --primary-light: #6366f1;
@@ -55,6 +59,7 @@
         .container {
             width: 100%;
             max-width: 800px;
+            perspective: 1000px;
         }
 
         .calculator-card {
@@ -173,6 +178,7 @@
             cursor: pointer;
             transition: all 0.3s ease;
             position: relative;
+            overflow: hidden;
             background: linear-gradient(to right, var(--primary-dark), var(--primary-light));
             color: white;
             backdrop-filter: blur(5px);
@@ -200,7 +206,7 @@
             -webkit-backdrop-filter: blur(10px);
             transform: translateY(20px);
             opacity: 0;
-            transition: opacity 0.5s ease, transform 0.5s ease;
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
         .dark-mode .results {
@@ -252,36 +258,18 @@
             opacity: 0.7;
         }
 
-        .chart-title {
-            margin: 1.5rem 0 1rem;
-            font-size: 1.1rem;
-            font-weight: 600;
-            text-align: center;
-        }
+        @media (max-width: 640px) {
+            .calculator-card {
+                padding: 1.5rem;
+            }
 
-        .chart-info {
-            display: flex;
-            justify-content: center;
-            margin-top: 1rem;
-        }
-        
-        .info-item {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-size: 0.875rem;
-        }
-        
-        .info-label {
-            font-weight: 500;
-        }
-        
-        .info-value {
-            font-weight: 700;
-        }
-        
-        .target-capital .info-value {
-            color: #ef4444;
+            .results-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .title {
+                font-size: 1.5rem;
+            }
         }
 
         /* Tooltip styles */
@@ -343,6 +331,7 @@
             opacity: 1;
         }
 
+        /* Animations */
         @keyframes pulse {
             0% { transform: scale(1); }
             50% { transform: scale(1.05); }
@@ -350,20 +339,105 @@
         }
 
         .pulse {
-            animation: pulse 2s infinite;
+            animation: pulse 1.5s infinite;
         }
         
+        /* Table styles */
+        .table-container {
+            overflow-x: auto;
+            margin-bottom: 1rem;
+            border-radius: 12px;
+            background: var(--input-bg-light);
+            border: 1px solid var(--border-light);
+        }
+        
+        .dark-mode .table-container {
+            background: var(--input-bg-dark);
+            border: 1px solid var(--border-dark);
+        }
+        
+        .growth-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.875rem;
+        }
+        
+        .growth-table th,
+        .growth-table td {
+            padding: 0.75rem;
+            text-align: right;
+            border-bottom: 1px solid var(--border-light);
+        }
+        
+        .growth-table th:first-child,
+        .growth-table td:first-child {
+            text-align: center;
+            font-weight: 500;
+        }
+        
+        .dark-mode .growth-table th,
+        .dark-mode .growth-table td {
+            border-bottom: 1px solid var(--border-dark);
+        }
+        
+        .growth-table thead th {
+            background-color: rgba(0, 0, 0, 0.02);
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+        }
+        
+        .dark-mode .growth-table thead th {
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+        
+        .growth-table tbody tr:hover {
+            background-color: rgba(0, 0, 0, 0.02);
+        }
+        
+        .dark-mode .growth-table tbody tr:hover {
+            background-color: rgba(255, 255, 255, 0.03);
+        }
+        
+        .growth-table .reached-target {
+            font-weight: 600;
+            color: var(--primary-light);
+        }
+        
+        .chart-info {
+            display: flex;
+            justify-content: center;
+            margin-top: 1rem;
+        }
+        
+        .info-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+        }
+        
+        .info-label {
+            font-weight: 500;
+        }
+        
+        .info-value {
+            font-weight: 700;
+        }
+        
+        .target-capital .info-value {
+            color: #ef4444;
+        }
+        
+        /* Media query for mobile */
         @media (max-width: 640px) {
-            .calculator-card {
-                padding: 1.5rem;
+            .growth-table {
+                font-size: 0.75rem;
             }
-
-            .results-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .title {
-                font-size: 1.5rem;
+            
+            .growth-table th,
+            .growth-table td {
+                padding: 0.5rem;
             }
         }
     </style>
@@ -419,7 +493,7 @@
                 </select>
             </div>
             
-            <button id="calculateBtn" class="button pulse">
+            <button id="calculateBtn" class="button">
                 Oblicz wolność finansową
             </button>
 
@@ -603,35 +677,31 @@
                         intersect: false
                     },
                     animation: {
-                        duration: 1000
+                        duration: 1500,
+                        easing: 'easeOutQuart'
                     },
                     scales: {
-                        xAxes: [{
-                            display: true,
-                            scaleLabel: {
+                        x: {
+                            title: {
                                 display: true,
-                                labelString: 'Lata',
-                                fontColor: textColor
-                            },
-                            gridLines: {
-                                color: gridColor
+                                text: 'Lata',
+                                color: textColor
                             },
                             ticks: {
-                                fontColor: textColor
+                                color: textColor
+                            },
+                            grid: {
+                                color: gridColor
                             }
-                        }],
-                        yAxes: [{
-                            display: true,
-                            scaleLabel: {
+                        },
+                        y: {
+                            title: {
                                 display: true,
-                                labelString: 'Kapitał [PLN]',
-                                fontColor: textColor
-                            },
-                            gridLines: {
-                                color: gridColor
+                                text: 'Kapitał [PLN]',
+                                color: textColor
                             },
                             ticks: {
-                                fontColor: textColor,
+                                color: textColor,
                                 callback: function(value) {
                                     if (value >= 1000000) {
                                         return (value / 1000000).toFixed(1) + ' mln';
@@ -640,36 +710,43 @@
                                     }
                                     return value;
                                 }
+                            },
+                            grid: {
+                                color: gridColor
                             }
-                        }]
-                    },
-                    legend: {
-                        labels: {
-                            fontColor: textColor,
-                            usePointStyle: true,
-                            fontSize: 12
                         }
                     },
-                    tooltips: {
-                        backgroundColor: isDarkMode ? 'rgba(30, 30, 34, 0.8)' : 'rgba(255, 255, 255, 0.8)',
-                        titleFontColor: textColor,
-                        bodyFontColor: textColor,
-                        borderColor: isDarkMode ? 'rgba(51, 65, 85, 0.8)' : 'rgba(226, 232, 240, 0.8)',
-                        borderWidth: 1,
-                        cornerRadius: 8,
-                        displayColors: true,
-                        padding: 12,
-                        callbacks: {
-                            label: function(tooltipItem, data) {
-                                let label = data.datasets[tooltipItem.datasetIndex].label || '';
-                                if (label) {
-                                    label += ': ';
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: textColor,
+                                usePointStyle: true,
+                                pointStyle: 'circle'
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: isDarkMode ? 'rgba(30, 30, 34, 0.8)' : 'rgba(255, 255, 255, 0.8)',
+                            titleColor: textColor,
+                            bodyColor: textColor,
+                            borderColor: isDarkMode ? 'rgba(51, 65, 85, 0.8)' : 'rgba(226, 232, 240, 0.8)',
+                            borderWidth: 1,
+                            cornerRadius: 8,
+                            displayColors: true,
+                            padding: 12,
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed.y !== null) {
+                                        label += new Intl.NumberFormat('pl-PL', { 
+                                            minimumFractionDigits: 0,
+                                            maximumFractionDigits: 0
+                                        }).format(context.parsed.y) + ' PLN';
+                                    }
+                                    return label;
                                 }
-                                label += new Intl.NumberFormat('pl-PL', { 
-                                    minimumFractionDigits: 0,
-                                    maximumFractionDigits: 0
-                                }).format(tooltipItem.yLabel) + ' PLN';
-                                return label;
                             }
                         }
                     }
@@ -686,4 +763,32 @@
             const monthlyExpenses = parseFloat(document.getElementById('monthlyExpenses').value);
             const withdrawalRate = parseFloat(document.getElementById('withdrawalRate').value);
             const timeHorizon = parseInt(document.getElementById('timeHorizon').value);
+            const portfolioComposition = document.getElementById('portfolioComposition').value;
+
+            // Validate input
+            if (isNaN(monthlyExpenses) || isNaN(withdrawalRate) || monthlyExpenses <= 0 || withdrawalRate <= 0) {
+                alert('Proszę wprowadzić poprawne wartości.');
+                return;
+            }
+
+            // Calculate required capital based on monthly expenses and withdrawal rate
+            const requiredCapital = (monthlyExpenses * 12) / (withdrawalRate / 100);
+
+            // Get coefficients for the specific scenario
+            const coef = coefficients[timeHorizon][`${portfolioComposition}/` + (100 - portfolioComposition)];
+
+            // Calculate monthly investments
+            const monthlyInvestment = Math.round(requiredCapital * coef.median);
+            const luckyScenario = Math.round(requiredCapital * coef.lucky);
+            const unluckyScenario = Math.round(requiredCapital * coef.unlucky);
+
+            // GSAP Animation for updating values
+            gsap.to('#requiredCapital', {
+                innerHTML: formatCurrency(requiredCapital),
+                duration: 1,
+                ease: 'power2.out'
+            });
             
+            gsap.to('#monthlyInvestment', {
+                innerHTML: formatCurrency(monthlyInvestment),
+                duration:
