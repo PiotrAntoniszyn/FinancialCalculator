@@ -253,6 +253,10 @@
             color: var(--primary-light);
         }
 
+        .dark-mode .result-value {
+            color: var(--primary-light);
+        }
+
         .result-description {
             font-size: 0.75rem;
             opacity: 0.7;
@@ -643,7 +647,12 @@
                             borderColor: '#6366f1',
                             backgroundColor: 'rgba(99, 102, 241, 0.1)',
                             borderWidth: 3,
-                            pointRadius: 0,
+                            pointRadius: (context) => {
+                                // Make points visible only every 5 years
+                                const index = context.dataIndex;
+                                return index % 5 === 0 ? 4 : 0;
+                            },
+                            pointBackgroundColor: '#6366f1',
                             tension: 0.3,
                             fill: false
                         },
@@ -885,3 +894,5 @@
         const calculateBtn = document.getElementById('calculateBtn');
         calculateBtn.classList.add('pulse');
     </script>
+</body>
+</html>
