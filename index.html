@@ -791,4 +791,97 @@
             
             gsap.to('#monthlyInvestment', {
                 innerHTML: formatCurrency(monthlyInvestment),
-                duration:
+                duration: 1,
+                ease: 'power2.out'
+            });
+            
+            gsap.to('#luckyScenario', {
+                innerHTML: formatCurrency(luckyScenario),
+                duration: 1, 
+                ease: 'power2.out'
+            });
+            
+            gsap.to('#unluckyScenario', {
+                innerHTML: formatCurrency(unluckyScenario),
+                duration: 1,
+                ease: 'power2.out'
+            });
+
+            // Calculate growth data for each scenario
+            const averageAnnualReturn = 0.07; // 7% average annual return for median scenario
+            const optimisticReturn = 0.09;    // 9% for lucky scenario
+            const pessimisticReturn = 0.05;   // 5% for unlucky scenario
+            
+            // Create year labels
+            const years = Array.from({length: parseInt(timeHorizon) + 1}, (_, i) => i);
+            
+            const medianGrowth = calculateGrowth(monthlyInvestment, averageAnnualReturn, years);
+            const luckyGrowth = calculateGrowth(luckyScenario, optimisticReturn, years);
+            const unluckyGrowth = calculateGrowth(unluckyScenario, pessimisticReturn, years);
+            
+            // Create the growth chart
+            createGrowthChart(requiredCapital, medianGrowth, luckyGrowth, unluckyGrowth, timeHorizon);
+
+            // Show results
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.classList.add('show');
+
+            // Scroll to results
+            resultsDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        // Add event listener to calculate button
+        document.getElementById('calculateBtn').addEventListener('click', calculateFinancialFreedom);
+
+        // Add event listeners for Enter key on inputs
+        document.getElementById('monthlyExpenses').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') calculateFinancialFreedom();
+        });
+        
+        document.getElementById('withdrawalRate').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') calculateFinancialFreedom();
+        });
+        
+        // Update chart when theme changes
+        themeToggle.addEventListener('click', () => {
+            // If chart exists and results are visible, update the chart with current values
+            if (growthChart && document.getElementById('results').classList.contains('show')) {
+                const monthlyExpenses = parseFloat(document.getElementById('monthlyExpenses').value);
+                const withdrawalRate = parseFloat(document.getElementById('withdrawalRate').value);
+                const timeHorizon = parseInt(document.getElementById('timeHorizon').value);
+                const portfolioComposition = document.getElementById('portfolioComposition').value;
+                
+                // Calculate required capital
+                const requiredCapital = (monthlyExpenses * 12) / (withdrawalRate / 100);
+                
+                // Get coefficients
+                const coef = coefficients[timeHorizon][`${portfolioComposition}/` + (100 - portfolioComposition)];
+                
+                // Calculate monthly investments
+                const monthlyInvestment = Math.round(requiredCapital * coef.median);
+                const luckyScenario = Math.round(requiredCapital * coef.lucky);
+                const unluckyScenario = Math.round(requiredCapital * coef.unlucky);
+                
+                // Create year labels
+                const years = Array.from({length: parseInt(timeHorizon) + 1}, (_, i) => i);
+                
+                // Calculate growth data for each scenario
+                const averageAnnualReturn = 0.07; 
+                const optimisticReturn = 0.09;    
+                const pessimisticReturn = 0.05;   
+                
+                const medianGrowth = calculateGrowth(monthlyInvestment, averageAnnualReturn, years);
+                const luckyGrowth = calculateGrowth(luckyScenario, optimisticReturn, years);
+                const unluckyGrowth = calculateGrowth(unluckyScenario, pessimisticReturn, years);
+                
+                // Update the chart with current values
+                setTimeout(() => {
+                    createGrowthChart(requiredCapital, medianGrowth, luckyGrowth, unluckyGrowth, timeHorizon);
+                }, 300);
+            }
+        });
+
+        // Add pulse animation to calculate button
+        const calculateBtn = document.getElementById('calculateBtn');
+        calculateBtn.classList.add('pulse');
+    </script>
