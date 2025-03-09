@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kalkulator Wolności Finansowej 2025</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.4/dist/Chart.min.js"></script>
+    <style>
+        :root {
+            --primary-light: #6366f1;
+            --primary-dark: #4f46e5;
+            --surface-light: rgba(255, 255, 255, 0.8);
+            --surface-dark: rgba(30, 30, 34, 0.8);
+            --text-light: #1e293b;
+            --text-dark: #e2e8f0;
+            --bg-light: linear-gradient(135deg, #f8fafc 0%, #e0e7ff 100%);
+            --bg-dark: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+            --card-shadow-light: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+            --card-shadow-dark: 0 10px 25px -5px rgba(0, 0, 0, 0.2), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+            --card-bg-light: rgba(255, 255, 255, 0.7);
+            --card-bg-dark: rgba(30, 30, 34, 0.7);
+            --input-bg-light: rgba(255, 255, 255, 0.5);
+            --input-bg-dark: rgba(15, 15, 20, 0.5);
+            --success-light: #10b981;
+            --success-dark: #059669;
+            --border-light: rgba(226, 232, 240, 0.8);
+            --border-dark: rgba(51, 65, 85, 0.8);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-light);
+            color: var(--text-light);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+            transition: background 0.5s ease;
+        }
+
+        body.dark-mode {
+            background: var(--bg-dark);
+            color: var(--text-dark);
+        }
+
+        .container {
+            width: 100%;
+            max-width: 800px;
+        }
+
+        .calculator-card {
+            background: var(--card-bg-light);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 24px;
+            box-shadow: var(--card-shadow-light);
+            border: 1px solid var(--border-light);
+            padding: 2.5rem;
+            transition: box-shadow 0.5s ease, border-color 0.3s ease;
+        }
+
+        .dark-mode .calculator-card {
+            background: var(--card-bg-dark);
+            box-shadow: var(--card-shadow-dark);
+            border: 1px solid var(--border-dark);
+        }
+
+        .header {
+            margin-bottom: 2rem;
+            text-align: center;
+            position: relative;
+        }
+
+        .title {
+            font-weight: 700;
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(to right, var(--primary-dark), var(--primary-light));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .subtitle {
+            font-weight: 400;
+            font-size: 1rem;
+            opacity: 0.8;
+        }
+
+        .theme-toggle {
+            position: absolute;
+            top: 0;
+            right: 0;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.5rem;
+            color: var(--text-light);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .dark-mode .theme-toggle {
+            color: var(--text-dark);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.75rem;
+            font-weight: 500;
+            font-size: 0.875rem;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 1rem;
+            border-radius: 12px;
+            border: 1px solid var(--border-light);
+            background: var(--input-bg-light);
+            color: var(--text-light);
+            font-size: 1rem;
+            font-family: 'Inter', sans-serif;
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            transition: all 0.3s ease;
+        }
+
+        .dark-mode input, .dark-mode select {
+            background: var(--input-bg-dark);
+            border: 1px solid var(--border-dark);
+            color: var(--text-dark);
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--primary-light);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+        }
+
+        .dark-mode input:focus, .dark-mode select:focus {
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.3);
+        }
+
+        input::placeholder {
+            opacity: 0.5;
+        }
+
+        .button {
+            width: 100%;
+            padding: 1rem;
+            border-radius: 12px;
+            border: none;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            background: linear-gradient(to right, var(--primary-dark), var(--primary-light));
+            color: white;
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+        }
+
+        .button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);
+        }
+
+        .button:active {
+            transform: translateY(0);
+        }
+
+        .results {
+            margin-top: 2rem;
+            background: var(--card-bg-light);
+            border-radius: 20px;
+            padding: 1.5rem;
+            display: none;
+            border: 1px solid var(--border-light);
+            box-shadow: var(--card-shadow-light);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            transform: translateY(20px);
+            opacity: 0;
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+
+        .dark-mode .results {
+            background: var(--card-bg-dark);
+            border: 1px solid var(--border-dark);
+            box-shadow: var(--card-shadow-dark);
+        }
+
+        .results.show {
+            display: block;
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .results-title {
+            font-weight: 600;
+            font-size: 1.25rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+        }
+
+        .result-item {
+            position: relative;
+        }
+
+        .result-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            opacity: 0.8;
+        }
+
+        .result-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+            color: var(--primary-light);
+        }
+
+        .result-description {
+            font-size: 0.75rem;
+            opacity: 0.7;
+        }
+
+        .chart-title {
+            margin: 1.5rem 0 1rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .chart-info {
+            display: flex;
+            justify-content: center;
+            margin-top: 1rem;
+        }
+        
+        .info-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+        }
+        
+        .info-label {
+            font-weight: 500;
+        }
+        
+        .info-value {
+            font-weight: 700;
+        }
+        
+        .target-capital .info-value {
+            color: #ef4444;
+        }
+
+        /* Tooltip styles */
+        .tooltip {
+            position: relative;
+            display: inline-block;
+            margin-left: 0.5rem;
+            cursor: help;
+        }
+
+        .tooltip-icon {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--text-light);
+            color: white;
+            font-size: 10px;
+            font-weight: bold;
+        }
+
+        .dark-mode .tooltip-icon {
+            background: var(--text-dark);
+            color: var(--text-light);
+        }
+
+        .tooltip-text {
+            visibility: hidden;
+            width: 200px;
+            background: var(--surface-light);
+            color: var(--text-light);
+            text-align: center;
+            border-radius: 8px;
+            padding: 0.75rem;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -100px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            box-shadow: var(--card-shadow-light);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            font-size: 0.75rem;
+            font-weight: normal;
+        }
+
+        .dark-mode .tooltip-text {
+            background: var(--surface-dark);
+            color: var(--text-dark);
+            box-shadow: var(--card-shadow-dark);
+        }
+
+        .tooltip:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        
+        @media (max-width: 640px) {
+            .calculator-card {
+                padding: 1.5rem;
+            }
+
+            .results-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .title {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="calculator-card">
+            <div class="header">
+                <h1 class="title">Kalkulator Wolności Finansowej</h1>
+                <p class="subtitle">Oblicz swój cel finansowy i drogę do niezależności</p>
+                <button class="theme-toggle" id="themeToggle">🌙</button>
+            </div>
+            
+            <div class="form-group">
+                <label for="monthlyExpenses">
+                    Miesięczne wydatki [PLN]
+                    <span class="tooltip">
+                        <span class="tooltip-icon">?</span>
+                        <span class="tooltip-text">Kwota comiesięcznych wydatków dla pierwszego miesiąca wolności finansowej</span>
+                    </span>
+                </label>
+                <input type="number" id="monthlyExpenses" class="input" value="5000" min="0" placeholder="np. 5000">
+            </div>
+            
+            <div class="form-group">
+                <label for="withdrawalRate">
+                    Stopa wypłaty [%]
+                    <span class="tooltip">
+                        <span class="tooltip-icon">?</span>
+                        <span class="tooltip-text">Zgodnie z "Regułą 4%" powinna wynosić 4%</span>
+                    </span>
+                </label>
+                <input type="number" id="withdrawalRate" class="input" value="4" min="1" max="10" step="0.5" placeholder="np. 4">
+            </div>
+            
+            <div class="form-group">
+                <label for="timeHorizon">Horyzont czasowy</label>
+                <select id="timeHorizon" class="input">
+                    <option value="10">10 lat</option>
+                    <option value="20">20 lat</option>
+                    <option value="30" selected>30 lat</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="portfolioComposition">Skład portfela (Akcje/Obligacje)</label>
+                <select id="portfolioComposition" class="input">
+                    <option value="0">0/100</option>
+                    <option value="25">25/75</option>
+                    <option value="50">50/50</option>
+                    <option value="75">75/25</option>
+                    <option value="100" selected>100/0</option>
+                </select>
+            </div>
+            
+            <button id="calculateBtn" class="button pulse">
+                Oblicz wolność finansową
+            </button>
+
+            <div id="results" class="results">
+                <h2 class="results-title">Twoja droga do wolności finansowej</h2>
+                <div class="results-grid">
+                    <div class="result-item">
+                        <span class="result-label">Wymagany kapitał</span>
+                        <div class="result-value" id="requiredCapital">0 PLN</div>
+                        <div class="result-description">Taka kwota zapewni wolność finansową na wybrany okres</div>
+                    </div>
+                    
+                    <div class="result-item">
+                        <span class="result-label">Miesięczna inwestycja (mediana)</span>
+                        <div class="result-value" id="monthlyInvestment">0 PLN</div>
+                        <div class="result-description">W przeciętnym scenariuszu</div>
+                    </div>
+                    
+                    <div class="result-item">
+                        <span class="result-label">Wariant szczęśliwy</span>
+                        <div class="result-value" id="luckyScenario">0 PLN</div>
+                        <div class="result-description">W najbardziej optymistycznym scenariuszu</div>
+                    </div>
+                    
+                    <div class="result-item">
+                        <span class="result-label">Wariant pechowy</span>
+                        <div class="result-value" id="unluckyScenario">0 PLN</div>
+                        <div class="result-description">W najbardziej pesymistycznym scenariuszu</div>
+                    </div>
+                </div>
+                
+                <div class="chart-container">
+                    <h3 class="chart-title">Wzrost kapitału w czasie</h3>
+                    <div style="height: 400px; margin-bottom: 20px;">
+                        <canvas id="growthChart"></canvas>
+                    </div>
+                    <div class="chart-info">
+                        <div class="info-item target-capital">
+                            <span class="info-label">Cel - wymagany kapitał:</span>
+                            <span id="targetCapitalValue" class="info-value">-</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Historical coefficients based on the document
+        const coefficients = {
+            10: {
+                '0/100': { median: 0.0079133, lucky: 0.00546, unlucky: 0.0104300 },
+                '25/75': { median: 0.0070500, lucky: 0.00488, unlucky: 0.0094633 },
+                '50/50': { median: 0.0068300, lucky: 0.00425, unlucky: 0.0091900 },
+                '75/25': { median: 0.0058867, lucky: 0.00371, unlucky: 0.0092833 },
+                '100/0': { median: 0.0055333, lucky: 0.00330, unlucky: 0.0111967 }
+            },
+            20: {
+                '0/100': { median: 0.0040800, lucky: 0.00184, unlucky: 0.0050667 },
+                '25/75': { median: 0.0029433, lucky: 0.00146, unlucky: 0.0045767 },
+                '50/50': { median: 0.0023933, lucky: 0.00120, unlucky: 0.0044600 },
+                '75/25': { median: 0.0021967, lucky: 0.00099, unlucky: 0.0043433 },
+                '100/0': { median: 0.0018900, lucky: 0.00085, unlucky: 0.0043033 }
+            },
+            30: {
+                '0/100': { median: 0.0019267, lucky: 0.00106, unlucky: 0.0031567 },
+                '25/75': { median: 0.0016933, lucky: 0.00085, unlucky: 0.0026367 },
+                '50/50': { median: 0.0011300, lucky: 0.00067, unlucky: 0.0021900 },
+                '75/25': { median: 0.0009700, lucky: 0.00053, unlucky: 0.0018567 },
+                '100/0': { median: 0.0008867, lucky: 0.00044, unlucky: 0.0016333 }
+            }
+        };
+
+        // Format number as currency
+        function formatCurrency(number) {
+            return new Intl.NumberFormat('pl-PL', { 
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0
+            }).format(number) + ' PLN';
+        }
+
+        // Theme toggle functionality
+        const themeToggle = document.getElementById('themeToggle');
+        themeToggle.addEventListener('click', () => {
+            document.body.classList.toggle('dark-mode');
+            themeToggle.textContent = document.body.classList.contains('dark-mode') ? '☀️' : '🌙';
+        });
+
+        // Function to calculate capital growth for each scenario
+        function calculateGrowth(monthlyInvestment, annualReturn, years) {
+            return years.map(year => {
+                if (year === 0) return 0;
+                
+                // Calculate capital at this year using the compound interest formula
+                // P × ((1 + r)^n - 1) / r
+                // Where P is monthly payment, r is monthly rate, n is number of months
+                const monthlyRate = annualReturn / 12;
+                const months = year * 12;
+                const futureValue = monthlyInvestment * ((Math.pow(1 + monthlyRate, months) - 1) / monthlyRate);
+                
+                return Math.round(futureValue);
+            });
+        }
+
+        // Chart configuration
+        let growthChart = null;
+        
+        // Function to create and update the growth chart
+        function createGrowthChart(requiredCapital, medianGrowth, luckyGrowth, unluckyGrowth, timeHorizon) {
+            const canvas = document.getElementById('growthChart');
+            
+            // Get theme colors
+            const isDarkMode = document.body.classList.contains('dark-mode');
+            const textColor = isDarkMode ? '#e2e8f0' : '#1e293b';
+            const gridColor = isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)';
+            
+            // Create year labels
+            const years = Array.from({length: parseInt(timeHorizon) + 1}, (_, i) => i);
+            
+            // Draw a horizontal line at the required capital
+            const targetLine = Array(years.length).fill(requiredCapital);
+            
+            // Destroy previous chart if it exists
+            if (growthChart) {
+                growthChart.destroy();
+            }
+            
+            // Create the chart
+            growthChart = new Chart(canvas, {
+                type: 'line',
+                data: {
+                    labels: years,
+                    datasets: [
+                        {
+                            label: 'Cel - wymagany kapitał',
+                            data: targetLine,
+                            borderColor: '#ef4444',
+                            backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                            borderWidth: 2,
+                            borderDash: [5, 5],
+                            pointRadius: 0,
+                            fill: false
+                        },
+                        {
+                            label: 'Wariant typowy',
+                            data: medianGrowth,
+                            borderColor: '#6366f1',
+                            backgroundColor: 'rgba(99, 102, 241, 0.1)',
+                            borderWidth: 3,
+                            pointRadius: 0,
+                            tension: 0.3,
+                            fill: false
+                        },
+                        {
+                            label: 'Wariant optymistyczny',
+                            data: luckyGrowth,
+                            borderColor: '#10b981',
+                            backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                            borderWidth: 2,
+                            pointRadius: 0,
+                            tension: 0.3,
+                            fill: false
+                        },
+                        {
+                            label: 'Wariant pesymistyczny',
+                            data: unluckyGrowth,
+                            borderColor: '#f59e0b',
+                            backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                            borderWidth: 2,
+                            pointRadius: 0,
+                            tension: 0.3,
+                            fill: false
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false
+                    },
+                    animation: {
+                        duration: 1000
+                    },
+                    scales: {
+                        xAxes: [{
+                            display: true,
+                            scaleLabel: {
+                                display: true,
+                                labelString: 'Lata',
+                                fontColor: textColor
+                            },
+                            gridLines: {
+                                color: gridColor
+                            },
+                            ticks: {
+                                fontColor: textColor
+                            }
+                        }],
+                        yAxes: [{
+                            display: true,
+                            scaleLabel: {
+                                display: true,
+                                labelString: 'Kapitał [PLN]',
+                                fontColor: textColor
+                            },
+                            gridLines: {
+                                color: gridColor
+                            },
+                            ticks: {
+                                fontColor: textColor,
+                                callback: function(value) {
+                                    if (value >= 1000000) {
+                                        return (value / 1000000).toFixed(1) + ' mln';
+                                    } else if (value >= 1000) {
+                                        return (value / 1000).toFixed(0) + ' tys';
+                                    }
+                                    return value;
+                                }
+                            }
+                        }]
+                    },
+                    legend: {
+                        labels: {
+                            fontColor: textColor,
+                            usePointStyle: true,
+                            fontSize: 12
+                        }
+                    },
+                    tooltips: {
+                        backgroundColor: isDarkMode ? 'rgba(30, 30, 34, 0.8)' : 'rgba(255, 255, 255, 0.8)',
+                        titleFontColor: textColor,
+                        bodyFontColor: textColor,
+                        borderColor: isDarkMode ? 'rgba(51, 65, 85, 0.8)' : 'rgba(226, 232, 240, 0.8)',
+                        borderWidth: 1,
+                        cornerRadius: 8,
+                        displayColors: true,
+                        padding: 12,
+                        callbacks: {
+                            label: function(tooltipItem, data) {
+                                let label = data.datasets[tooltipItem.datasetIndex].label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                label += new Intl.NumberFormat('pl-PL', { 
+                                    minimumFractionDigits: 0,
+                                    maximumFractionDigits: 0
+                                }).format(tooltipItem.yLabel) + ' PLN';
+                                return label;
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // Update target capital info
+            document.getElementById('targetCapitalValue').textContent = formatCurrency(requiredCapital);
+        }
+
+        // Calculate financial freedom
+        function calculateFinancialFreedom() {
+            // Get input values
+            const monthlyExpenses = parseFloat(document.getElementById('monthlyExpenses').value);
+            const withdrawalRate = parseFloat(document.getElementById('withdrawalRate').value);
+            const timeHorizon = parseInt(document.getElementById('timeHorizon').value);
+            
